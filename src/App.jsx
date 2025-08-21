@@ -1,31 +1,49 @@
 import './App.scss';
+import { useSearchParams } from 'react-router-dom';
 import { MoviesList } from './components/MoviesList';
 import moviesFromServer from './api/movies.json';
 
-export const App = () => (
-  <div className="page">
-    <div className="page-content">
-      <div className="box">
-        <div className="field">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label htmlFor="search-query" className="label">
-            Search movie
-          </label>
+export const App = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get('query')?.trim().toLowerCase() || '';
 
-          <div className="control">
-            <input
-              type="text"
-              id="search-query"
-              className="input"
-              placeholder="Type search word"
-            />
+  const handleChange = e => {
+    setSearchParams({ query: e.target.value });
+  };
+
+  const visibleMovies = moviesFromServer.filter(movie => {
+    const title = movie.title.toLowerCase();
+    const description = movie.description.toLowerCase();
+
+    return title.includes(query) || description.includes(query);
+  });
+
+  return (
+    <div className="page">
+      <div className="page-content">
+        <div className="box">
+          <div className="field">
+            <label htmlFor="search-query" className="label">
+              Search movie
+            </label>
+
+            <div className="control">
+              <input
+                type="text"
+                id="search-query"
+                className="input"
+                placeholder="Type search word"
+                value={query}
+                onChange={handleChange}
+              />
+            </div>
           </div>
         </div>
+
+        <MoviesList movies={visibleMovies} />
       </div>
 
-      <MoviesList movies={moviesFromServer} />
+      <div className="sidebar">Sidebar goes here</div>
     </div>
-
-    <div className="sidebar">Sidebar goes here</div>
-  </div>
-);
+  );
+};
