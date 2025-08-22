@@ -1,21 +1,24 @@
 import './App.scss';
-import { useSearchParams } from 'react-router-dom';
+import './App.scss';
+import { useState } from 'react';
 import { MoviesList } from './components/MoviesList';
 import moviesFromServer from './api/movies.json';
 
 export const App = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get('query')?.trim().toLowerCase() || '';
 
-  const handleChange = e => {
-    setSearchParams({ query: e.target.value });
+  const [query, setQuery] = useState('');
+
+
+  const handleInputChange = (event) => {
+    setQuery(event.target.value); 
   };
 
-  const visibleMovies = moviesFromServer.filter(movie => {
+  const visibleMovies = moviesFromServer.filter((movie) => {
     const title = movie.title.toLowerCase();
-    const description = movie.description.toLowerCase();
+    const description = (movie.description || '').toLowerCase();
+    const normalizedQuery = query.trim().toLowerCase();
 
-    return title.includes(query) || description.includes(query);
+    return title.includes(normalizedQuery) || description.includes(normalizedQuery);
   });
 
   return (
@@ -34,7 +37,7 @@ export const App = () => {
                 className="input"
                 placeholder="Type search word"
                 value={query}
-                onChange={handleChange}
+                onChange={handleInputChange}
               />
             </div>
           </div>
